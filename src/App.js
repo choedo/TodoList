@@ -1,43 +1,63 @@
-import React, { useState } from 'react';
-import './App.css';
-import Board from './components/Board';
-import { BsPlusCircleFill } from "react-icons/bs";
+import React, { useState, useRef, useCallback } from 'react';
+import styled from 'styled-components';
+import TodoInsert from './components/TodoInsert';
+import TodoList from './components/TodoList';
+import TodoTemplate from './components/TodoTemplate';
 
+const Template = styled.div`
+  width: 768px;
+  margin: 100px auto 0;
+  background: none;
+  border-radius: 15px;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  @media screen and (max-width: 768px) {
+    width: 100%;
+  }
+`;
 
 function App() {
-  const [inputValue, setInputValue] = useState('');
+  const [todos, setTodos] = useState([]);
+  const nextId = useRef(1);
 
-  const [todoList, setTodoList] = useState([]);
+  const onInsert = useCallback(
+    text => {
+      const todo = {
+        id: nextId.current,
+        text,
+        checked: false
+      }
+      setTodos(todos.concat(todo));
+      nextId.current += 1;
+    }, [todos]
+  );
 
-  const addBtn = () => {
-    if(inputValue === '') {
-      alert('할 일을 입력해주세요!');
-      return false;
-    }else {
-      setTodoList([...todoList, inputValue]);
-      setInputValue('');
-    }
-  }
+  const onRemove = useCallback(
+    id => {
+      setTodos(
+        todos.filter(todo => todo.id !== id)
+      );
+    }, [todos]
+  );
 
-  const today = new Date();
-  const dateName = today.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-  const weekName = today.toLocaleDateString('ko-KR', {
-    weekday: 'long'
-  });
+  const onToggle = useCallback(
+    id => {
+      setTodos(
+        todos.map(todo =>
+          todo.id === id ? { ...todo, checked: !todo.checked } : todo)
+      );
+    }, [todos]
+  );
 
   return (
-    <div className='container'>
-      <h1 className='title'>{dateName}<span>({weekName})</span></h1>
-      <div className='input_area'>
-        <input type="text" placeholder="할 일을 입력해주세요" onChange={(e) => setInputValue(e.target.value)} value={inputValue} />
-        <button onClick={addBtn}><BsPlusCircleFill className='addBtn' /></button>
-      </div>
-      <Board todoList={todoList} />
-    </div>
+    <Template>
+      <TodoTemplate />
+      <TodoInsert onInsert={onInsert} />
+      <TodoList 
+        todos={todos} 
+        onRemove={onRemove} 
+        onToggle={onToggle} 
+      />
+    </Template>
   );
 }
 
