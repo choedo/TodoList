@@ -49,16 +49,14 @@ const RemoveBoxBlock = styled.div`
     }
 `;
 
-function TodoListItem({ todo, onRemove, onToggle }) {
-    const { id, text, checked } = todo;
-
+function TodoListItem({ todo, onToggle, onRemove }) {
     return(
         <TodoListItemBlock>
-            <CheckBoxBlock checked={checked}>
-                {checked ? <BiBadgeCheck onClick={() => onToggle(id)} /> : <BiBadge onClick={() => onToggle(id)} />}
-                <p>{text}</p>
+            <CheckBoxBlock checked={todo.checked}>
+                {todo.checked ? <BiBadgeCheck onClick={() => onToggle(todo.id)} /> : <BiBadge onClick={() => onToggle(todo.id)} />}
+                <p>{todo.text}</p>
             </CheckBoxBlock>
-            <RemoveBoxBlock onClick={() => onRemove(id)}>
+            <RemoveBoxBlock onClick={() => onRemove(todo.id)}>
                 <BiTrash />
             </RemoveBoxBlock>
         </TodoListItemBlock>

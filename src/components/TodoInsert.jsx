@@ -1,7 +1,5 @@
-import React, { useState } from "react";
 import styled from "styled-components";
 import { BiPencil } from "react-icons/bi";
-import { useCallback } from "react";
 
 const TodoInsertBlock = styled.form`
     display: flex;
@@ -32,26 +30,20 @@ const TodoInsertBlock = styled.form`
     }
 `
 
-function TodoInsert({ onInsert }) {
-    const [value, setValue] = useState('');
-    const onChange = useCallback(e => {
-        setValue(e.target.value);
-    }, []);
-    const onSubmit = useCallback(
-        e => {
-            onInsert(value);
-            setValue('');
-
-            e.preventDefault();
-        }, [onInsert, value]
-    );
+function TodoInsert({ input, onChangeInput, onInsert }) {
+    const onSubmit = e => {
+        e.preventDefault();
+        onInsert(input);
+        onChangeInput('');
+    }
+    const onChange = e => onChangeInput(e.target.value);
 
     return(
         <TodoInsertBlock onSubmit={onSubmit}>
             <input 
                 type="text" 
                 placeholder="할 일을 입력하세요" 
-                value={value}
+                value={input}
                 onChange={onChange}
             />
             <button type="submit"><BiPencil /></button>

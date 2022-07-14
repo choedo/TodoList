@@ -1,8 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import TodoInsert from './components/TodoInsert';
 import TodoList from './components/TodoList';
 import TodoTemplate from './components/TodoTemplate';
+import { connect } from 'react-redux';
+import { changeInput, insert, toggle, remove } from './modules/todos';
 
 const Template = styled.div`
   width: 768px;
@@ -15,50 +17,34 @@ const Template = styled.div`
   }
 `;
 
-function App() {
-  const [todos, setTodos] = useState([]);
-  const nextId = useRef(1);
-
-  const onInsert = useCallback(
-    text => {
-      const todo = {
-        id: nextId.current,
-        text,
-        checked: false
-      }
-      setTodos(todos.concat(todo));
-      nextId.current += 1;
-    }, [todos]
-  );
-
-  const onRemove = useCallback(
-    id => {
-      setTodos(
-        todos.filter(todo => todo.id !== id)
-      );
-    }, [todos]
-  );
-
-  const onToggle = useCallback(
-    id => {
-      setTodos(
-        todos.map(todo =>
-          todo.id === id ? { ...todo, checked: !todo.checked } : todo)
-      );
-    }, [todos]
-  );
-
+function App({ input, todos, changeInput, insert, toggle, remove }) {
   return (
     <Template>
       <TodoTemplate />
-      <TodoInsert onInsert={onInsert} />
+      <TodoInsert 
+        input={input}
+        todos={todos} 
+        onChangeInput={changeInput} 
+        onInsert={insert} 
+      />
       <TodoList 
         todos={todos} 
-        onRemove={onRemove} 
-        onToggle={onToggle} 
+        onRemove={remove} 
+        onToggle={toggle} 
       />
     </Template>
   );
 }
 
-export default App;
+export default connect(
+  ({ todos }) => ({
+    input: todos.input,
+    todos: todos.todos
+  }),
+  {
+    changeInput,
+    insert,
+    toggle,
+    remove
+  }
+)(App);
